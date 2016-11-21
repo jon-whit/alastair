@@ -20,9 +20,6 @@ function [K] = dlqr_inf(A, B, Q, R)
 %Use P to find K
 K = (R+B.'*P*B)^(-1)*(B.'*P*A);
 
-% verify that G and K are the same
-sprintf('%d\n%d', G, K)
-
 end
 
 

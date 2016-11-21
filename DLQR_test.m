@@ -6,7 +6,7 @@ clc
 % system inputs
 
 %for infinite time horizon, set time_h = 0, for finite set time_h=1
-time_h=0;
+time_h=1;
 
 % dynamic parameters
 b = 100;
@@ -45,8 +45,6 @@ X_dot_d = @(x_d,u_d) double(Ad*x_d + Bd*u_d);
 Q = q*eye(length(A));
 Q(1,1) = 0;
 R = r*eye(size(B,2));
-
-
 
 ud = zeros(1,N);
 

@@ -1,14 +1,14 @@
-function [] = FPTaylor_file( C, V, D, E )
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
+function [ filename ] = FPTaylor_file( C, V, D, E )
+
 LC = size(C,1);
 LV = size(V,1);
 LD = size(D,1);
 LE = size(E,1);
 
-filestring = 'Constants\n';
-filename = fopen('FPTinput.txt','w');
+filename = 'FPTinput.txt';
+fileID = fopen(filename,'w');
 
+filestring = 'Constants\n';
 for i = 1:LC
     filestring = [filestring,'\t',C{i,1},' = ',char(C{i,2})];
     if i == LC
@@ -20,7 +20,8 @@ end
 
 filestring = [filestring,'Variables\n'];
 for v = 1:LV
-    filestring = [filestring,'\t',V{v,1},' ',V{v,2},' in [',num2str(V{v,3}),']'];
+    nums = V{v, 3};
+    filestring = [filestring,'\t',V{v,1},' ',V{v,2},' in [',num2str(nums(1)),', ',num2str(nums(2)),']'];
     if v == LV
         filestring = [filestring,'\n;\n\n'];
     else
@@ -48,7 +49,7 @@ for e = 1:LE
     end
 end
 
-fprintf(filename,filestring);
-fclose(filename);
+fprintf(fileID,filestring);
+fclose(fileID);
 end
 

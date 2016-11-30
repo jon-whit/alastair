@@ -1,30 +1,37 @@
-function [ bounds, abs_err ] = fptaylor_mat( file1, file2 )
-%fptaylor_mat Summary of this function goes here
-%   Detailed explanation goes here
-str1 = 'fptaylor -c ';
-str2 = ' ';
-% file_1 = string(file1);
-% file_2 = string(file2);
-command = [ str1 file1 str2 file2 ];
-[status, cmdout] = system(command);
+function [ bounds, abs_errs ] = fptaylor_mat( config_path, file_path )
 
-sprintf('%d\n%d', status, cmdout);
+cmd = 'fptaylor -c ';
+
+command = [ cmd config_path ' ' file_path ];
+[~, cmdout] = system(command);
+
+Cstr = strsplit(cmdout, '\n');
 
 bounds_str = 'Bounds (without rounding): ';
-bounds_start = strfind(cmdout, bounds_str);
-% bounds_end = bounds_start+length(bounds_str);
+I = strfind(Cstr, bounds_str);
+i = ~cellfun(@isempty,I);
+outputs = Cstr(i~=0);
 
-abs_err_str = 'Absolute error (approximate): ';
-abs_err_start = strfind(cmdout, abs_err_str);
-if abs_err_start == 0;
-    abs_err_str = 'Absolute error (exact): ';
-abs_err_start = strfind(cmdout, abs_err_str);
+bounds = zeros(length(outputs), 2);
+for j=1:length(outputs)
+    scanned = textscan(outputs{j}, '%s %s %s [%f, %f]');
+    bound = scanned(4:5);
+    bounds(j, :) = cell2mat(bound);
 end
 
-bounds = cmdout(bounds_start:abs_err_start);
 
-abs_err_end = abs_err_start+length(abs_err_str);
-abs_err = cmdout(abs_err_start:abs_err_end);
+abs_err_str = 'Absolute error (exact): ';
+I = strfind(Cstr, abs_err_str);
+i = ~cellfun(@isempty,I);
+outputs = Cstr(i~=0);
+
+abs_errs = zeros(length(outputs), 1);
+for j=1:length(outputs)
+    scanned = textscan(outputs{j}, '%s %s %s %f');
+    abs_err = scanned{4};
+    abs_errs(j, :) = abs_err;
+end
+
 
 end
 

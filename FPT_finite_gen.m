@@ -1,4 +1,4 @@
-function [ file ] = FPT_finite_gen( B,M,G,q1,r1,Prange )
+function [ file ] = FPT_finite_gen( B,M,G,q1,r1,Prange,dtype )
 
 syms b m g q r
 
@@ -33,14 +33,25 @@ C = {'b',sym(B);...
      'R_1_1',R1};
  
 % variable definition
-f32 = 'float32';
-f64 = 'float64';
+if strcmp(dtype,'single')
+    flt = 'float32';
+    rnd = 'rnd32';
+    prec = 7;
+elseif strcmp(dtype, 'double')
+    rnd = 'rnd64';
+    flt = 'float64';
+    prec = 17;
+else
+    flt = 'float32';
+    rnd = 'rnd32';
+    prec = 7;
+end
 
 
-V = {f64,'P_1_1',Prange(1,:);...
-     f64,'P_1_2',Prange(2,:);...
-     f64,'P_2_1',Prange(3,:);...
-     f64,'P_2_2',Prange(4,:)};
+V = {flt,'P_1_1',Prange(1,:);...
+     flt,'P_1_2',Prange(2,:);...
+     flt,'P_2_1',Prange(3,:);...
+     flt,'P_2_2',Prange(4,:)};
 
 % Declaring definitions
 A = sym('A_%d_%d',[2 2]);
@@ -52,15 +63,14 @@ P = sym('P_%d_%d',size(A));
 Pnext =  Q + (A.'*P*A) - (A.'*P*B)*((R+B.'*P*B)^-1)*(B.'*P*A);
 Knext = -1*((R+B.'*P*B)^-1)*(B.'*P*A);
 
-r32 = 'rnd32';
-r64 = 'rnd64';
 
-D = {'Pnext_1_1',r32,Pnext(1,1);...
-     'Pnext_1_2',r32,Pnext(1,2);...
-     'Pnext_2_1',r32,Pnext(2,1);...
-     'Pnext_2_2',r32,Pnext(2,2);...
-     'Knext_1',r32,Knext(1);...
-     'Knext_2',r32,Knext(2)};
+
+D = {'Pnext_1_1',rnd,Pnext(1,1);...
+     'Pnext_1_2',rnd,Pnext(1,2);...
+     'Pnext_2_1',rnd,Pnext(2,1);...
+     'Pnext_2_2',rnd,Pnext(2,2);...
+     'Knext_1',rnd,Knext(1);...
+     'Knext_2',rnd,Knext(2)};
  
 % Declare Expressions
 
@@ -71,8 +81,9 @@ E = {'Pnext_1_1';...
      'Knext_1';...
      'Knext_2'...
      };
- 
-file = FPTaylor_file(C,V,D,E);
 
+    file = FPTaylor_file(C,V,D,E,prec);
+
+    
 end
 

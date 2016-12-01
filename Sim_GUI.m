@@ -22,7 +22,7 @@ function varargout = Sim_GUI(varargin)
 
 % Edit the above text to modify the response to help Sim_GUI
 
-% Last Modified by GUIDE v2.5 21-Nov-2016 14:47:26
+% Last Modified by GUIDE v2.5 30-Nov-2016 14:05:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -58,14 +58,10 @@ handles.output = hObject;
 set(handles.axes1,'XLim',[0 5])
 set(handles.axes1,'YLim', [0 15])
 
-set(handles.axes2,'XLim',[0 0.1])
-set(handles.axes2,'YLim',[0 2])
-
 set(handles.axes3,'XLim',[0 5])
     set(handles.axes3,'YLim', [(-25) (45)])
 
 set(handles.axes1,'Box','on')
-set(handles.axes2,'Box','on')
 set(handles.axes3,'Box','on')
 set(handles.axes5,'Box','on')
 set(handles.axes6,'Box','on')
@@ -80,10 +76,6 @@ ylabel('')
 axes(handles.axes6)
 ylabel('Road Incline')
 xlabel('time (sec)')
-
-
-axes(handles.axes2)
-xlabel('Floating point error')
 
 
 % Update handles structure
@@ -140,67 +132,71 @@ dtype = get(handles.edit5,'String');
 tH = get(handles.checkbox1,'Value');
 inVel = str2num(get(handles.edit6,'String'));
 desVel = str2num(get(handles.edit7,'String'));
+N = str2num(get(handles.edit9,'String'));
 
-parameters = {q,r,dtype,tH,inVel,desVel};
+parameters = {q,r,dtype,tH,inVel,desVel,N};
 save('simParam.mat','parameters');
 
 % read in simulation file
 file = get(handles.SimFilebox,'String');
 
+
 run(file);
+
+
 out = load('output.mat');
 
 
-time = out.output(1,:);
-force = out.output(2,:);
-vel = out.output(3,:);
-rounderror = out.output(4,:);
-roadang = out.output(5,:)*180/pi;
+time = out.output{1};
+force = out.output{2};
+forcep = out.output{3};
+forcem = out.output{4};
+vel = out.output{5};
+velp = out.output{6};
+velm = out.output{7};
+rounderror = out.output{8};
+roadang = out.output{9};
+
 
 n = length(time);
-framerate = 24;
-t = 0:1/(framerate):time(n);
-
-
-for i = 1:10:(length(time))
-    f = i;
 
     axes(handles.axes5)
-    ylabel('')
+    plot(time,rounderror)
+    ylabel('Rounding error')
     
     
     %velocity plot
     axes(handles.axes1);
-    plot(time(1:f),vel(1:f))
+    plot(time,vel)
+    hold on
+    plot(time,velm)
+    plot(time,velp)
+    hold off
     set(handles.axes1,'XLim',[0 time(n)]);
     set(handles.axes1,'YLim', [(min(vel)-1) (max(vel)+1)]);
+    legend('Nominal','Upperbound','Lowerbound')
     ylabel('Velocity (m/s)')
-    %drawnow
     
-    
-    axes(handles.axes2);
-    barh(rounderror(f))
-    set(handles.axes2,'XLim',[0 max(rounderror)]);
-    set(handles.axes2,'YLim',[0 2]);
-    xlabel('Floating point error')
-    %drawnow
-    
+       
     axes(handles.axes3);
-    plot(time(1:f),force(1:f))
+    plot(time,force)
+    hold on
+    plot(time,forcem)
+    plot(time,forcep)
+    hold off
     set(handles.axes3,'XLim',[0 time(n)]);
     set(handles.axes3,'YLim', [(min(force)-1) (max(force)+1)]);
+    legend('Nominal','Upperbound','Lowerbound')
     ylabel('Wheel Force (N)')
     xlabel('time (sec)')
-    %drawnow
+    
     
     axes(handles.axes6);
-    plot(time(1:f),roadang(1:f))
+    plot(time,roadang)
     set(handles.axes6,'XLim',[0 time(n)]);
     set(handles.axes6,'YLim', [(min(roadang)-10) (max(roadang)+10)]);
     ylabel('Road Incline')
     xlabel('time (sec)')
-    drawnow
-end
     
 
 
@@ -318,6 +314,52 @@ function edit7_Callback(hObject, eventdata, handles)
 % --- Executes during object creation, after setting all properties.
 function edit7_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to edit7 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit8_Callback(hObject, eventdata, handles)
+% hObject    handle to edit8 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit8 as text
+%        str2double(get(hObject,'String')) returns contents of edit8 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit8_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit8 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit9_Callback(hObject, eventdata, handles)
+% hObject    handle to edit9 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit9 as text
+%        str2double(get(hObject,'String')) returns contents of edit9 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit9_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit9 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 

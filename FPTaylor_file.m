@@ -1,4 +1,4 @@
-function [ filename ] = FPTaylor_file( C, V, D, E )
+function [ filename ] = FPTaylor_file( C, V, D, E,prec )
 
 LC = size(C,1);
 LV = size(V,1);
@@ -21,7 +21,7 @@ end
 filestring = [filestring,'Variables\n'];
 for v = 1:LV
     nums = V{v, 3};
-    filestring = [filestring,'\t',V{v,1},' ',V{v,2},' in [',num2str(nums(1)),', ',num2str(nums(2)),']'];
+    filestring = [filestring,'\t',V{v,1},' ',V{v,2},' in [',num2str(nums(1),prec),', ',num2str(nums(2),prec),']'];
     if v == LV
         filestring = [filestring,'\n;\n\n'];
     else

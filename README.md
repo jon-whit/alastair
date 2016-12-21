@@ -6,5 +6,5 @@ A project to simulate and estimate LQR Floating-point Round-off Error using FPTa
 
 ## Dependencies
 * MATLAB
-* FPTaylor
-* Gelpia
+* [FPTaylor](https://github.com/soarlab/FPTaylor)
+* [Gelpia](https://github.com/soarlab/gelpia)
